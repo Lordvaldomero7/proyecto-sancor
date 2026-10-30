@@ -6,12 +6,8 @@ import {
   QrCode,
   ShieldCheck,
   Building2,
-  Zap,
-  ChevronRight,
-  ChevronLeft,
-  X,
 } from 'lucide-react';
-import { ENTITIES, VIDEO_PITCH_STEPS } from '../data/mockData';
+import { ENTITIES } from '../data/mockData';
 
 export const NAV_ITEMS = [
   {
@@ -41,33 +37,10 @@ export default function Layout({
   setActiveTab,
   activeEntityId,
   setActiveEntityId,
-  videoMode,
-  setVideoMode,
-  pitchStepIndex,
-  setPitchStepIndex,
   children,
 }) {
   const currentEntity =
     ENTITIES.find((item) => item.id === activeEntityId) || ENTITIES[0];
-
-  const currentPitchStep =
-    VIDEO_PITCH_STEPS[pitchStepIndex] || VIDEO_PITCH_STEPS[0];
-
-  const handleSelectPitchStep = (index) => {
-    const target = VIDEO_PITCH_STEPS[index];
-    if (!target) return;
-    setPitchStepIndex(index);
-    setActiveTab(target.vistaId);
-    if (target.entidadSugerida) {
-      setActiveEntityId(target.entidadSugerida);
-    }
-  };
-
-  const handleToggleVideoMode = () => {
-    const next = !videoMode;
-    setVideoMode(next);
-    if (next) handleSelectPitchStep(0);
-  };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
@@ -95,8 +68,8 @@ export default function Layout({
             </div>
           </div>
 
-          {/* Selector de Entidad + Botón Modo Presentación Video */}
-          <div className="flex items-center gap-2.5">
+          {/* Selector de Entidad Activa (El botón flotante de Demo Video se ubica en la esquina superior derecha) */}
+          <div className="flex items-center gap-2.5 pr-44 sm:pr-64">
             <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
               <Building2 className="w-4 h-4 text-slate-500 shrink-0" />
               <select
@@ -112,20 +85,6 @@ export default function Layout({
                 ))}
               </select>
             </div>
-
-            <button
-              type="button"
-              onClick={handleToggleVideoMode}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
-                videoMode
-                  ? 'bg-amber-500 text-white shadow-sm'
-                  : 'bg-slate-900 hover:bg-slate-800 text-white'
-              }`}
-            >
-              <Zap className="w-4 h-4 text-amber-400" />
-              <span className="hidden md:inline">⚡ Modo Presentación Video</span>
-              <span className="md:hidden">Modo Video</span>
-            </button>
           </div>
         </div>
 
@@ -140,7 +99,7 @@ export default function Layout({
                   key={item.id}
                   type="button"
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors ${
+                  className={`flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                     isActive
                       ? 'border-emerald-600 text-emerald-700 font-semibold'
                       : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
@@ -155,63 +114,9 @@ export default function Layout({
         </div>
       </header>
 
-      {/* GUÍA COMPACTA DE MODO VIDEO (Solo visible cuando está activo) */}
-      {videoMode && (
-        <div className="bg-amber-50 border-b border-amber-200">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2 text-xs font-semibold text-amber-900">
-                <span className="px-2 py-0.5 rounded bg-amber-200/80 text-amber-900">
-                  Paso {pitchStepIndex + 1} de {VIDEO_PITCH_STEPS.length} (
-                  {currentPitchStep.duracionSeg})
-                </span>
-                <span>{currentPitchStep.titulo}</span>
-              </div>
-              <p className="text-xs sm:text-sm text-amber-800">
-                {currentPitchStep.guion}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={() =>
-                  handleSelectPitchStep(
-                    (pitchStepIndex - 1 + VIDEO_PITCH_STEPS.length) %
-                      VIDEO_PITCH_STEPS.length
-                  )
-                }
-                className="p-1.5 rounded-lg bg-white border border-amber-300 text-amber-900 hover:bg-amber-100"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  handleSelectPitchStep(
-                    (pitchStepIndex + 1) % VIDEO_PITCH_STEPS.length
-                  )
-                }
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700"
-              >
-                Siguiente
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setVideoMode(false)}
-                className="p-1.5 text-amber-700 hover:text-amber-950"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* CONTENIDO PRINCIPAL */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {/* Resumen limpio en 1 línea de la entidad seleccionada */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6 pb-28">
+        {/* Resumen limpio de la entidad seleccionada */}
         <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
           <div>
             <div className="flex items-center gap-2">
